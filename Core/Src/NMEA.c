@@ -71,14 +71,22 @@ void NMEA_Parser() {
 	case NMEA_STATE_ID:
 		if(byte == NMEA_DELIM_CHAR) {
 			cur_id[indexChar] = '\0';
+
 			if(strcmp((char*)cur_id, "GPGGA") == 0) {
 				dataframe = GGA_frame;
 				HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_14);
+			}
+			else if(strcmp((char*)cur_id, "GPRMC") == 0) {
+				dataframe = RMC_frame;
+			}
+			else if(strcmp((char*)cur_id, "GPGSA") == 0) {
+				dataframe = GSA_frame;
 			}
 			else {
 				state = NMEA_STATE_WAIT;
 				break;
 			}
+
 			indexChar = 0;
 			state = NMEA_STATE_PARSE;
 		}
