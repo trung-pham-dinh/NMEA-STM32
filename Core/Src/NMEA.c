@@ -29,12 +29,11 @@ typedef enum {
 	NMEA_STATE_END
 } NMEA_State;
 
+typedef uint8_t field_t[NMEA_FIELD_MAX_SIZE];
 
 static uint8_t GGA_frame[NMEA_GGA_SIZE][NMEA_FIELD_MAX_SIZE];
 static uint8_t RMC_frame[NMEA_RMC_SIZE][NMEA_FIELD_MAX_SIZE];
 static uint8_t GSA_frame[NMEA_GSV_SIZE][NMEA_FIELD_MAX_SIZE];
-
-
 
 void NMEA_Init(UART_HandleTypeDef* huart) {
 	uart = huart;
@@ -51,8 +50,10 @@ void NMEA_ReadByte() {
 void NMEA_Parser() {
 	static NMEA_State state = NMEA_STATE_WAIT;
 	static uint8_t cur_id[6];
-	static uint8_t indexChar = 0, indexField = 0;
-	static uint8_t (*dataframe)[NMEA_FIELD_MAX_SIZE];
+	static field_t *dataframe;
+
+	uint8_t indexChar = 0, indexField = 0;
+	uint8_t totalsum=0, checksum=0;
 
 	if(FF_isEmpty()) return;
 
@@ -92,6 +93,7 @@ void NMEA_Parser() {
 		}
 		else {
 			cur_id[indexChar++] = byte;
+			totalsum ^= byte;
 		}
 		break;
 	case NMEA_STATE_PARSE:
@@ -109,15 +111,25 @@ void NMEA_Parser() {
 		}
 		else {
 			dataframe[indexField][indexChar++] = byte;
+			totalsum ^= byte;
 		}
 		break;
 	case NMEA_STATE_END:
-		dataframe[indexField][indexChar++] = byte;
-		if(indexChar == 2) {
-			dataframe[indexField][indexChar]  = '\0';
+		if(indexChar == 0) {
+			checksum += 16* ((byte>='0'&&byte<='9')? byte-48:byte-55);
+			indexChar++;
+		}
+		else if(indexChar == 1) {
+			checksum += ((byte>='0'&&byte<='9')? byte-48:byte-55);
+			indexChar++;
+		}
+		else{
+			dataframe[indexField][0] = (checksum==totalsum);
 			state = NMEA_STATE_WAIT;
 		}
 		break;
 	}
 }
+
+
 

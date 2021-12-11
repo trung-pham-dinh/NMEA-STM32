@@ -24,7 +24,7 @@ typedef enum {
   GGA_Units_2,
   GGA_Age_of_Diff_Corr,
   GGA_Diff_Ref_Station_ID,
-  GGA_Checksum
+  GGA_Valid
 } GGA_Data;
 
 typedef enum {
