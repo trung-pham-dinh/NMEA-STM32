@@ -51,9 +51,7 @@ void NMEA_Parser() {
 	static NMEA_State state = NMEA_STATE_WAIT;
 	static uint8_t cur_id[6];
 	static field_t *dataframe;
-
-	static uint8_t indexChar = 0, indexField = 0;
-
+	static uint8_t indexChar = 0, indexField = 1; // first field is for Valid bit
 	static uint8_t totalsum=0, checksum=0;
 
 	if(FF_isEmpty()) return;
@@ -65,8 +63,11 @@ void NMEA_Parser() {
 		if(byte == NMEA_START_CHAR) {
 			state = NMEA_STATE_ID;
 			memset(cur_id, '\0', 6);
+
 			indexChar = 0;
-			indexField = 0;
+			indexField = 1;
+			totalsum = 0;
+			checksum = 0;
 			dataframe = NULL;
 		}
 		break;
@@ -107,7 +108,6 @@ void NMEA_Parser() {
 			dataframe[indexField][indexChar]  = '\0';
 
 			state = NMEA_STATE_END;
-			indexField++;
 			indexChar = 0;
 		}
 		else {
@@ -116,17 +116,13 @@ void NMEA_Parser() {
 		}
 		break;
 	case NMEA_STATE_END:
-		if(indexChar == 0) {
-			checksum += 16* ((byte>='0'&&byte<='9')? byte-48:byte-55);
-			indexChar++;
-		}
-		else if(indexChar == 1) {
-			checksum += ((byte>='0'&&byte<='9')? byte-48:byte-55);
-			indexChar++;
-		}
-		else{
-			dataframe[indexField][0] = (checksum==totalsum);
+		if(indexChar == 2) {
+			dataframe[0][0] = (checksum==totalsum);
+			dataframe[0][1] = '\0';
 			state = NMEA_STATE_WAIT;
+		}
+		else {
+			checksum += ((indexChar++)? 1:16)* ((byte>='0'&&byte<='9')? byte-48:byte-55);
 		}
 		break;
 	}

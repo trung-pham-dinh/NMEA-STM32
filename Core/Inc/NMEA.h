@@ -10,6 +10,7 @@
 #include "main.h"
 
 typedef enum {
+	GGA_Valid,
   GGA_UTC_Time,
   GGA_Latitude,
   GGA_NS_Indicator,
@@ -23,8 +24,7 @@ typedef enum {
   GGA_Geoid_Separation,
   GGA_Units_2,
   GGA_Age_of_Diff_Corr,
-  GGA_Diff_Ref_Station_ID,
-  GGA_Valid
+  GGA_Diff_Ref_Station_ID
 } GGA_Data;
 
 typedef enum {
