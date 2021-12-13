@@ -5,9 +5,10 @@
  *      Author: fhdtr
  */
 
-
+#include "NMEA.h"
 #include "Fifo.h"
 #include <string.h>
+#include <stdlib.h>
 
 static uint8_t incomeByte;
 static UART_HandleTypeDef* uart;
@@ -62,7 +63,6 @@ void NMEA_Parser() {
 	case NMEA_STATE_WAIT:
 		if(byte == NMEA_START_CHAR) {
 			state = NMEA_STATE_ID;
-			memset(cur_id, '\0', 6);
 
 			indexChar = 0;
 			indexField = 1;
@@ -126,6 +126,32 @@ void NMEA_Parser() {
 		}
 		break;
 	}
+}
+
+uint8_t NMEA_Get_GGA_Longitude(float *lon) {
+	static float longitude;
+	static char longi_dd[4];
+	if(GGA_frame[GGA_Valid][0]) {
+		strncpy(longi_dd, (char*)GGA_frame[GGA_Longitude], 3);
+		*lon = longitude = 1.0*atoi(longi_dd) + atof((char*)GGA_frame[GGA_Longitude]+3) / 60;
+
+		return 1;
+	}
+	*lon = longitude;
+	return 0;
+}
+
+uint8_t NMEA_Get_GGA_Latitude(float *lat) {
+	static float latitude;
+	static char lat_dd[3];
+	if(GGA_frame[GGA_Valid][0]) {
+		strncpy(lat_dd, (char*)GGA_frame[GGA_Latitude], 2);
+		*lat = latitude = 1.0*atoi(lat_dd) + atof((char*)GGA_frame[GGA_Latitude]+2) / 60;
+
+		return 1;
+	}
+	*lat = latitude;
+	return 0;
 }
 
 

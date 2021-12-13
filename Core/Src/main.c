@@ -107,6 +107,7 @@ int main(void)
   while (1)
   {
 	  NMEA_Parser();
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -250,6 +251,7 @@ static void MX_GPIO_Init(void)
 
 }
 
+float longi = 0, lat =0;
 /* USER CODE BEGIN 4 */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	static uint16_t counter = 1000;
@@ -259,6 +261,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 			if(!counter) {
 				counter = 1000;
 				HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_15);
+				NMEA_Get_GGA_Longitude(&longi);
+				NMEA_Get_GGA_Latitude(&lat);
 			}
 		}
 	}

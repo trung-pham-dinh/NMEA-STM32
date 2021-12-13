@@ -36,4 +36,7 @@ void NMEA_Init(UART_HandleTypeDef* huart);
 void NMEA_ReadByte();
 void NMEA_Parser();
 
+uint8_t NMEA_Get_GGA_Longitude(float* lon);
+uint8_t NMEA_Get_GGA_Latitude(float *lat);
+
 #endif /* INC_NMEA_H_ */
