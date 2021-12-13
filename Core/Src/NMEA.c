@@ -52,8 +52,9 @@ void NMEA_Parser() {
 	static uint8_t cur_id[6];
 	static field_t *dataframe;
 
-	uint8_t indexChar = 0, indexField = 0;
-	uint8_t totalsum=0, checksum=0;
+	static uint8_t indexChar = 0, indexField = 0;
+
+	static uint8_t totalsum=0, checksum=0;
 
 	if(FF_isEmpty()) return;
 
