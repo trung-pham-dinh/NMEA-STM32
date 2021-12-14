@@ -10,7 +10,7 @@
 #include "main.h"
 
 typedef enum {
-	GGA_Valid,
+	GGA_Status, // bit0: isValid, bit1:isRead
   GGA_UTC_Time,
   GGA_Latitude,
   GGA_NS_Indicator,
@@ -33,10 +33,11 @@ typedef enum {
 }NMEA_ID;
 
 void NMEA_Init(UART_HandleTypeDef* huart);
-void NMEA_ReadByte();
+void NMEA_ReadByte(); // called in HAL_UART_RxCpltCallback()
 void NMEA_Parser();
 
-uint8_t NMEA_Get_GGA_Longitude(float* lon);
-uint8_t NMEA_Get_GGA_Latitude(float *lat);
-
+uint8_t NMEA_Get_GGA_Longitude(float* lon, char* e_w);
+uint8_t NMEA_Get_GGA_Latitude(float *lat, char* n_s);
+uint8_t NMEA_Get_GGA_UTC_Time(uint8_t *h, uint8_t *m, float *s);
+uint8_t NMEA_Get_GGA_MSL_Altitude(float *alti);
 #endif /* INC_NMEA_H_ */

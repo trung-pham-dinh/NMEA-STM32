@@ -45,8 +45,11 @@ TIM_HandleTypeDef htim6;
 UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
-uint8_t c = 0;
-uint8_t pData[100];
+float longi = 0, lat =0;
+  char ns,ew;
+  uint8_t h,m;
+  float s;
+  float alti;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -108,6 +111,10 @@ int main(void)
   {
 	  NMEA_Parser();
 
+	  NMEA_Get_GGA_Longitude(&longi, &ew);
+	  NMEA_Get_GGA_Latitude(&lat, &ns);
+	  NMEA_Get_GGA_UTC_Time(&h, &m, &s);
+	  NMEA_Get_GGA_MSL_Altitude(&alti);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -251,7 +258,7 @@ static void MX_GPIO_Init(void)
 
 }
 
-float longi = 0, lat =0;
+
 /* USER CODE BEGIN 4 */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	static uint16_t counter = 1000;
@@ -261,8 +268,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 			if(!counter) {
 				counter = 1000;
 				HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_15);
-				NMEA_Get_GGA_Longitude(&longi);
-				NMEA_Get_GGA_Latitude(&lat);
+
 			}
 		}
 	}
